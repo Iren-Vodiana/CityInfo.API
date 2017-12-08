@@ -13,8 +13,8 @@ namespace CityInfo.API.Controllers
     [Route("api/cities")]
     public class PointsOfInterestController:Controller
     {
-        public ILogger<PointsOfInterestController> _logger { get; set; }
-        public IMailService _mailService { get; set; }
+        private ILogger<PointsOfInterestController> _logger;
+        private IMailService _mailService;
 
         public PointsOfInterestController(ILogger<PointsOfInterestController> logger, IMailService mailService)
         {
