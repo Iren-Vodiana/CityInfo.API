@@ -48,13 +48,15 @@ namespace CityInfo.API
 
             //services.AddTransient<LocalMailService>(); - provide concrete type
 #if DEBUG
-            services.AddTransient<IMailService, LocalMailService>();
+            services.AddTransient<IMailService, LocalMailService>(); //each time they are request
 #else
             services.AddTransient<IMailService, CloudMailService>();
 #endif
             //services.AddDbContext<CityInfoContext>(o => o.UseSqlServer(@"Server=node1adventure.database.windows.net;Database=CityInfoDB;User id=iren@node1adventure.database.windows.net;password=CoOk999!;")); //scoped lifetime
             var connectionString = Startup.Configuration["connectionStrings:cityInfoDBConnectionString"];
             services.AddDbContext<CityInfoContext>(o => o.UseSqlServer(connectionString)); //use Windows credentials
+
+            services.AddScoped<ICityInfoRepository, CityInfoRepository>(); //once for request
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,6 +80,18 @@ namespace CityInfo.API
 
             app.UseStatusCodePages();
             Debug.WriteLine(env.ContentRootPath);
+
+            AutoMapper.Mapper.Initialize(cfg => 
+            {
+                cfg.CreateMap<Entities.City, Models.CityWithoutPointsOfInterestDto>();
+                cfg.CreateMap<Entities.City, Models.CityDto>();
+                cfg.CreateMap<Entities.PointOfInterest, Models.PointOfInterestDto>();
+                cfg.CreateMap<Models.PointOfInterestDto, Entities.PointOfInterest>();
+                cfg.CreateMap<Models.PointOfInterestForCreationDto, Entities.PointOfInterest>();
+                cfg.CreateMap<Models.PointOfInterestForUpdateDto, Entities.PointOfInterest>();
+                cfg.CreateMap<Entities.PointOfInterest, Models.PointOfInterestForUpdateDto>();
+                
+            });
 
             app.UseMvc();
 
